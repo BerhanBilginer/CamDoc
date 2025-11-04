@@ -1,0 +1,81 @@
+{
+  "camera_quality_thresholds": {
+    "day": {
+      "meanY": {
+        "good_min": 120,
+        "poor_max": 40,
+        "overexposed_max": 200
+      },
+      "variance_of_laplacian": {
+        "good_min": 250,
+        "poor_max": 100
+      },
+      "edge_density": {
+        "good_min": 0.12,
+        "poor_max": 0.05
+      },
+      "entropy": {
+        "good_min": 5.5,
+        "poor_max": 4.0
+      },
+      "dynamic_range": {
+        "good_min": 180,
+        "poor_max": 80
+      },
+      "dark_channel_mean": {
+        "good_max": 80,
+        "poor_min": 130
+      },
+      "clipping_ratio": {
+        "good_max": 0.20,
+        "poor_min": 0.30
+      }
+    },
+
+    "night": {
+      "meanY": {
+        "good_min": 40,
+        "good_max": 90,
+        "poor_max": 30,
+        "overexposed_max": 180
+      },
+      "variance_of_laplacian": {
+        "good_min": 150,
+        "poor_max": 80
+      },
+      "edge_density": {
+        "good_min": 0.08,
+        "poor_max": 0.04
+      },
+      "entropy": {
+        "good_min": 4.8,
+        "poor_max": 4.0
+      },
+      "dynamic_range": {
+        "good_min": 120,
+        "poor_max": 80
+      },
+      "dark_channel_mean": {
+        "good_max": 100,
+        "poor_min": 130
+      },
+      "clipping_ratio": {
+        "good_max": 0.25,
+        "poor_min": 0.35
+      }
+    },
+
+    "quality_classes": {
+      "high_quality_min": 0.80,
+      "medium_quality_min": 0.60,
+      "low_quality_min": 0.40,
+      "unusable_max": 0.40
+    },
+
+    "health_policy": {
+      "maintenance_threshold": 0.50,
+      "disable_analytics_threshold": 0.35,
+      "alert_cooldown_sec": 600
+    }
+  }
+}
