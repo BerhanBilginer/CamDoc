@@ -1,0 +1,65 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+      - id: check-toml
+      - id: check-merge-conflict
+      - id: check-added-large-files
+        args: ['--maxkb=1000']
+      - id: debug-statements
+
+  - repo: https://github.com/psf/black
+    rev: 23.9.1
+    hooks:
+      - id: black
+        language_version: python3
+
+  - repo: https://github.com/pycqa/isort
+    rev: 5.12.0
+    hooks:
+      - id: isort
+        args: ["--profile", "black"]
+
+  - repo: https://github.com/pycqa/flake8
+    rev: 6.1.0
+    hooks:
+      - id: flake8
+        args: [--max-line-length=88, --extend-ignore=E203,W503]
+
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.5
+    hooks:
+      - id: bandit
+        args: ['-r', 'src/', '-f', 'json', '-o', 'bandit-report.json']
+        pass_filenames: false
+
+  - repo: local
+    hooks:
+      - id: conventional-commit
+        name: Conventional Commit
+        entry: |
+          python -c "
+          import sys
+          import re
+          
+          commit_msg = sys.argv[1]
+          with open(commit_msg, 'r') as f:
+              message = f.read().strip()
+          
+          pattern = r'^(feat|fix|docs|style|refactor|perf|test|chore|build|ci)(\(.+\))?: .{1,50}'
+          
+          if not re.match(pattern, message):
+              print('❌ Commit message must follow conventional commits format:')
+              print('   <type>[optional scope]: <description>')
+              print('   Example: feat(core): add new quality metric')
+              sys.exit(1)
+          else:
+              print('✅ Commit message follows conventional commits format')
+          "
+        language: system
+        stages: [commit-msg]
+        pass_filenames: false

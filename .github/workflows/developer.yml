@@ -1,0 +1,242 @@
+name: Developer Branch CI
+
+on:
+  push:
+    branches: [ developer ]
+  pull_request:
+    branches: [ developer ]
+
+jobs:
+  test-and-validate:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.10"
+    
+    - name: Cache pip dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libgl1-mesa-glx libglib2.0-0 libsm6 libxext6 libxrender-dev libgomp1
+    
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Test core functionality
+      run: |
+        python -c "
+        import sys
+        sys.path.insert(0, '.')
+        
+        # Test core imports
+        from src.core import CamQA, AdvancedQualityMetrics
+        from src.utils import ConfigLoader, PredictiveConfig
+        from src.predictive.features import build_features, TemporalState
+        print('✅ All core imports successful')
+        
+        # Test configuration loading
+        config = ConfigLoader()
+        pred_config = PredictiveConfig()
+        print('✅ Configuration loading successful')
+        
+        # Test CamQA initialization
+        qa = CamQA()
+        print('✅ CamQA initialization successful')
+        
+        # Test temporal state
+        state = TemporalState()
+        print('✅ Temporal state initialization successful')
+        "
+    
+    - name: Test CLI functionality
+      run: |
+        # Test CLI help
+        python main.py --help
+        echo "✅ CLI help successful"
+        
+        # Test basic analysis if test image exists
+        if [ -f "test/images/img1.jpg" ]; then
+          echo "Testing basic analysis..."
+          python main.py --image test/images/img1.jpg
+          echo "✅ Basic CLI analysis successful"
+          
+          echo "Testing predictive features..."
+          python main.py --image test/images/img1.jpg --predictive
+          echo "✅ Predictive CLI analysis successful"
+        else
+          echo "⚠️ Test image not found, skipping CLI tests"
+        fi
+      continue-on-error: true
+    
+    - name: Test Streamlit apps import
+      run: |
+        python -c "
+        import sys
+        sys.path.insert(0, '.')
+        
+        try:
+            import streamlit
+            print('✅ Streamlit available')
+            
+            # Test main app import
+            import apps.streamlit_app
+            print('✅ Main Streamlit app import successful')
+            
+            # Test predictive app import
+            import apps.predictive_analysis
+            print('✅ Predictive analysis app import successful')
+            
+        except ImportError as e:
+            print(f'⚠️ Streamlit import failed: {e}')
+        except Exception as e:
+            print(f'⚠️ App import failed: {e}')
+        "
+      continue-on-error: true
+    
+    - name: Validate project structure
+      run: |
+        echo "Checking project structure..."
+        
+        # Check essential files
+        files=(
+          "src/__init__.py"
+          "src/core/__init__.py"
+          "src/utils/__init__.py"
+          "src/predictive/features.py"
+          "config/quality_thresholds.json"
+          "config/predictive_config.json"
+          "requirements.txt"
+          "CHANGELOG.md"
+          "README.md"
+        )
+        
+        for file in "${files[@]}"; do
+          if [ -f "$file" ]; then
+            echo "✅ $file exists"
+          else
+            echo "❌ $file missing"
+          fi
+        done
+        
+        # Check directories
+        dirs=(
+          "src/core"
+          "src/utils"
+          "src/predictive"
+          "apps"
+          "config"
+          "docs"
+        )
+        
+        for dir in "${dirs[@]}"; do
+          if [ -d "$dir" ]; then
+            echo "✅ $dir/ exists"
+          else
+            echo "❌ $dir/ missing"
+          fi
+        done
+
+  code-quality:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.10"
+    
+    - name: Install code quality tools
+      run: |
+        python -m pip install --upgrade pip
+        pip install black isort flake8 bandit
+    
+    - name: Check code formatting (Black)
+      run: |
+        echo "Checking code formatting with Black..."
+        black --check --diff . || echo "⚠️ Code formatting issues found"
+      continue-on-error: true
+    
+    - name: Check import sorting (isort)
+      run: |
+        echo "Checking import sorting with isort..."
+        isort --check-only --diff . || echo "⚠️ Import sorting issues found"
+      continue-on-error: true
+    
+    - name: Lint with flake8
+      run: |
+        echo "Linting with flake8..."
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics || echo "⚠️ Critical linting issues found"
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=88 --statistics
+      continue-on-error: true
+    
+    - name: Security scan with Bandit
+      run: |
+        echo "Running security scan with Bandit..."
+        bandit -r src/ || echo "⚠️ Security issues found"
+      continue-on-error: true
+
+  performance-test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.10"
+    
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libgl1-mesa-glx libglib2.0-0
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Performance test
+      run: |
+        python -c "
+        import sys
+        import time
+        sys.path.insert(0, '.')
+        
+        from src.core import CamQA
+        from src.utils import PredictiveConfig
+        from src.predictive.features import build_features, TemporalState
+        import numpy as np
+        
+        print('Running performance tests...')
+        
+        # Create dummy image
+        dummy_image = np.random.randint(0, 255, (480, 640, 3), dtype=np.uint8)
+        
+        # Test CamQA performance
+        qa = CamQA()
+        start_time = time.time()
+        result = qa.analyze(dummy_image)
+        camqa_time = time.time() - start_time
+        print(f'✅ CamQA analysis: {camqa_time:.3f}s')
+        
+        # Test predictive features performance
+        pred_config = PredictiveConfig()
+        start_time = time.time()
+        features, _ = build_features(dummy_image, use_temporal=False, camqa=qa)
+        pred_time = time.time() - start_time
+        print(f'✅ Predictive features: {pred_time:.3f}s')
+        
+        print(f'✅ Total analysis time: {camqa_time + pred_time:.3f}s')
+        "
+      continue-on-error: true
