@@ -1,8 +1,16 @@
 # 📷 CamDoc - Camera Quality Assessment & Health Check
 
-A comprehensive camera quality assessment system that combines fast real-time metrics with advanced perceptual quality models.
+A comprehensive camera quality assessment system that combines fast real-time metrics with advanced perceptual quality models and predictive features for temporal analysis.
 
-**Version**: 1.1.0 | **Last Updated**: 2025-11-06
+**Version**: 1.2.0 | **Last Updated**: 2025-11-10
+
+## 🆕 What's New in v1.2.0
+
+- **🔮 Predictive Features**: Temporal analysis with jitter detection and flicker analysis
+- **📹 Video Analysis**: Frame-by-frame temporal stability assessment
+- **🎯 Stability Classification**: Excellent/Good/Fair/Poor stability ratings
+- **⚖️ Improved Weights**: Advanced metrics now 65% (was 44%) for better accuracy
+- **🎨 Unified UI**: Consistent quality calculation across all interfaces
 
 ---
 
