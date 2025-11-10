@@ -4,3 +4,4 @@ opencv-python-headless
 plotly
 numpy
 Pillow
+pandas

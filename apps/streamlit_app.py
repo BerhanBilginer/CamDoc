@@ -211,7 +211,7 @@ def main():
             )
         
         if use_advanced:
-            st.caption("Overall Quality = CamQA (56%) + Advanced metrics (44%)")
+            st.caption("Overall Quality = CamQA (35%) + Advanced metrics (65%)")
             st.caption("Advanced: BRISQUE, NIQE (PyIQA), Total Variation (PIQ)")
         else:
             st.caption("Overall Quality = CamQA metrics only (Sharpness, Brightness, Color, Lens)")
@@ -306,29 +306,29 @@ def main():
             with col_adv4:
                 st.markdown("#### Metric Weights")
                 st.markdown("""
-                **CamQA (56%)**
-                - Sharpness: 16%
-                - Brightness: 16%
-                - Color: 12%
-                - Lens: 12%
+                **CamQA (35%)**
+                - Sharpness: 10.5%
+                - Brightness: 10.5%
+                - Color: 7%
+                - Lens: 7%
                 
-                **Advanced (44%)**
-                - BRISQUE: 18%
-                - NIQE: 18%
-                - TV: 12%
+                **Advanced (65%)**
+                - BRISQUE: 27%
+                - NIQE: 27%
+                - TV: 11%
                 """)
             
             # Calculate Overall Quality (CamQA + Advanced combined)
             overall = (
-                # CamQA metrics - 56% weight
-                0.16 * s["sharpness"] +
-                0.16 * s["brightness"] +
-                0.12 * s["color_intensity"] +
-                0.12 * s["lens_cleanliness"] +
-                # Advanced metrics - 44% weight
-                0.18 * adv_res['normalized']['brisque_quality'] +
-                0.18 * adv_res['normalized']['niqe_quality'] +
-                0.12 * adv_res['normalized']['tv_quality']
+                # CamQA metrics - 35% weight
+                0.105 * s["sharpness"] +
+                0.105 * s["brightness"] +
+                0.07 * s["color_intensity"] +
+                0.07 * s["lens_cleanliness"] +
+                # Advanced metrics - 65% weight
+                0.27 * adv_res['normalized']['brisque_quality'] +
+                0.27 * adv_res['normalized']['niqe_quality'] +
+                0.11 * adv_res['normalized']['tv_quality']
             )
             
             # Update quality class based on combined score
@@ -352,12 +352,14 @@ def main():
                     st.error("🚫 Analytics Should Be Disabled")
             
             # Show breakdown
-            st.markdown("### 📊 Score Breakdown")
+            st.markdown("### 📊 Quality Components")
             col_summary1, col_summary2 = st.columns(2)
             with col_summary1:
-                st.metric("CamQA Only", f"{camqa_only:.3f}", help="Fast metrics: Sharpness, Brightness, Color, Lens")
+                camqa_contribution = 0.105 * s["sharpness"] + 0.105 * s["brightness"] + 0.07 * s["color_intensity"] + 0.07 * s["lens_cleanliness"]
+                st.metric("CamQA Contribution (35%)", f"{camqa_contribution:.3f}", help="Weighted CamQA metrics contribution to overall score")
             with col_summary2:
-                st.metric("Advanced Only", f"{adv_res['overall_quality']:.3f}", help="BRISQUE, NIQE, Total Variation")
+                adv_contribution = 0.27 * adv_res['normalized']['brisque_quality'] + 0.27 * adv_res['normalized']['niqe_quality'] + 0.11 * adv_res['normalized']['tv_quality']
+                st.metric("Advanced Contribution (65%)", f"{adv_contribution:.3f}", help="Weighted advanced metrics contribution to overall score")
             
             # Advanced metrics visualization
             st.markdown("### 📊 Advanced Metrics Radar")

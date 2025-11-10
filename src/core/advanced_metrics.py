@@ -76,22 +76,22 @@ def normalize(v, lo, hi, invert=False):
     return 1.0 - s if invert else s
 
 
-def normalize_tv(tv_raw, optimal=0.020, min_threshold=0.005, max_good=0.040, max_bad=0.100):
+def normalize_tv(tv_raw, optimal=200.0, min_threshold=50.0, max_good=400.0, max_bad=1000.0):
     """
     Normalize Total Variation with optimal range consideration.
     
     TV interpretation:
-    - Very low (< 0.005): Too smooth, detail loss → Bad
-    - Optimal (0.015-0.025): Good balance → Best
-    - High (> 0.040): Noisy or over-processed → Bad
-    - Very high (> 0.100): Very noisy → Very bad
+    - Very low (< 50): Too smooth, detail loss → Bad
+    - Optimal (150-250): Good balance → Best
+    - High (> 400): Noisy or over-processed → Bad
+    - Very high (> 1000): Very noisy → Very bad
     
     Args:
         tv_raw: Raw TV value
-        optimal: Optimal TV value (default: 0.020)
-        min_threshold: Below this = detail loss (default: 0.005)
-        max_good: Above this starts to be noisy (default: 0.040)
-        max_bad: Maximum before score goes to 0 (default: 0.100)
+        optimal: Optimal TV value (default: 200.0)
+        min_threshold: Below this = detail loss (default: 50.0)
+        max_good: Above this starts to be noisy (default: 400.0)
+        max_bad: Maximum before score goes to 0 (default: 1000.0)
     
     Returns:
         float: Quality score in [0,1], higher is better

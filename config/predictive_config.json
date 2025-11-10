@@ -1,0 +1,71 @@
+{
+  "predictive_features": {
+    "temporal_settings": {
+      "meanY_buffer_size": 30,
+      "optical_flow_max_corners": 200,
+      "optical_flow_quality_level": 0.01,
+      "optical_flow_min_distance": 7,
+      "optical_flow_block_size": 7,
+      "optical_flow_win_size": [21, 21],
+      "optical_flow_max_level": 3
+    },
+    
+    "feature_thresholds": {
+      "jitter_px": {
+        "low": 0.5,
+        "medium": 2.0,
+        "high": 5.0,
+        "critical": 10.0
+      },
+      "frame_diff_var": {
+        "low": 100,
+        "medium": 500,
+        "high": 1000,
+        "critical": 2000
+      },
+      "meanY_flicker_std": {
+        "low": 2.0,
+        "medium": 5.0,
+        "high": 10.0,
+        "critical": 20.0
+      }
+    },
+    
+    "quality_weights": {
+      "camqa_base": 0.4,
+      "advanced_metrics": 0.3,
+      "temporal_stability": 0.3
+    },
+    
+    "analysis_settings": {
+      "default_short_side": 720,
+      "default_ema": 0.2,
+      "enable_advanced_by_default": false,
+      "enable_temporal_by_default": true,
+      "feature_extract_timeout_ms": 5000
+    },
+    
+    "stability_classification": {
+      "excellent": {
+        "jitter_max": 0.5,
+        "flicker_std_max": 2.0,
+        "frame_diff_var_max": 100
+      },
+      "good": {
+        "jitter_max": 2.0,
+        "flicker_std_max": 5.0,
+        "frame_diff_var_max": 500
+      },
+      "fair": {
+        "jitter_max": 5.0,
+        "flicker_std_max": 10.0,
+        "frame_diff_var_max": 1000
+      },
+      "poor": {
+        "jitter_max": 10.0,
+        "flicker_std_max": 20.0,
+        "frame_diff_var_max": 2000
+      }
+    }
+  }
+}
